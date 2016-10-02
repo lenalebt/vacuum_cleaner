@@ -14,4 +14,9 @@ object RobotBrain {
   case object BumpWall
   case class BumpRobot(otherBrain: ActorRef)
   case class FoundDirt(amount: Double)
+  case object Faster
+  case object Slower
+  case object Stop
+  case class TurnRight(amount: Double)
+  case class TurnLeft(amount: Double)
 }

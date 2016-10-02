@@ -13,6 +13,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
   "com.typesafe.akka" %% "akka-remote" % akkaVersion,
 
+  "org.scalaz" %% "scalaz-core" % "7.2.6",
+
   "org.scalanlp" %% "breeze" % "0.11.2"
 )
 

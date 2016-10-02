@@ -2,7 +2,7 @@ package de.lenabrueder.vacuumcleaner
 
 import akka.actor.{ Actor, ActorRef, Props }
 import breeze.linalg.{ DenseVector, norm }
-import de.lenabrueder.vacuumcleaner.WorldActor.{ Done, Simulator, StartSimulation, WorldState }
+import de.lenabrueder.vacuumcleaner.WorldActor.{ Done, Simulator, StartSimulation, Tick, TickDone, WorldState }
 
 /**
   * The world actor that holds state of the world that contains all simulated objects.
@@ -11,25 +11,37 @@ import de.lenabrueder.vacuumcleaner.WorldActor.{ Done, Simulator, StartSimulatio
   * that the simulated objects can then update themselves according to the current state of the world.
   */
 class WorldActor extends Actor {
-  var room: Room = null
-  var robots: Seq[ActorRef] = Seq.empty
+  var robots: Map[ActorRef, Option[Any]] = Map.empty
   var state: WorldState = null
 
   override def receive: Receive = {
     case StartSimulation(newRoom, numRobots) =>
       startSimulation(newRoom, numRobots)
       sender ! Done
+    case TickDone(status) =>
+      robots = robots.updated(sender(), Some(TickDone(status)))
+      state = state.copy(states = status :: state.states.filterNot(_.simulator != sender()).toList)
+      if (tickDone()) { //reset last message seen - we wait for the last to finish before ticking again.
+        robots = robots.map{ case (robot, _) => (robot, None) }
+      }
   }
 
   def startSimulation(newRoom: Room, numRobots: Int): Unit = {
-    room = newRoom
-    robots = for { i <- 1 to numRobots } yield {
-      context.actorOf(Props[Simulator])
-    }
-    state = WorldState(for { robot <- robots } yield {
-      Simulator.State(robot, room.randomPosition)
+    val room = newRoom
+    robots = (for { i <- 1 to numRobots } yield {
+      context.actorOf(Props[Simulator]) -> None
+    }).toMap
+    state = WorldState(room, for { (robot, lastMessage) <- robots } yield {
+      Simulator.State(robot, room.randomPosition, DenseVector.zeros(3), 0.0)
     })
   }
+
+  def tick(): Unit = {
+    for { (robot, lastMessage) <- robots } {
+      robot ! Tick(state)
+    }
+  }
+  def tickDone(): Boolean = robots.forall(_._2.exists(_.isInstanceOf[TickDone]))
 }
 
 object WorldActor {
@@ -38,6 +50,7 @@ object WorldActor {
 
   implicit class DenseVectorOps(val a: DenseVector[Double]) extends AnyVal {
     def distanceTo(b: DenseVector[Double]): Double = norm(a - b)
+    def contact(size: Double)(b: DenseVector[Double]): Boolean = distanceTo(b) < 2 * size
   }
 
   trait SimulatorState {
@@ -48,9 +61,14 @@ object WorldActor {
 
     require(position.length == 3)
 
+    val heading: DenseVector[Double]
+    require(heading.length == 3)
+
+    val velocity: Double
+
     val simulator: ActorRef
   }
-  case class WorldState(states: Iterable[SimulatorState])
+  case class WorldState(room: Room, states: Iterable[SimulatorState])
 
   /**
     * Every simulated object will get this message for each simulation step and must respond with TickDone. There is a
