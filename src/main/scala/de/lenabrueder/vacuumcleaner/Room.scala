@@ -20,7 +20,7 @@ trait Room {
   def randomPosition: DenseVector[Double] = randomPositions.head
 }
 object Room {
-  val dimension = 3
+  val dimension = 2
 }
 
 class RectangleRoom(w: Double, h: Double) extends Room {
