@@ -28,15 +28,16 @@
            .attr("cx", function (d) { return d.position.x * scaling + scaling/2; })
            .attr("cy", function (d) { return d.position.y * scaling + scaling/2; })
            .attr("r", function (d) { return scaling/2; })
-           .style("fill", function(d) { return 'orange'; });
-        /*robots.append("text")
+           .style("fill", function(d) { return 'orange'; })
+           .style("stroke", "black");
+        robots.append("text")
                 .attr("x", function (d) { return d.position.x * scaling + scaling/2; })
-                .attr("y", function (d) { return d.position.y * scaling + scaling/2; })
+                .attr("dy", ".45em")
+                //.attr("y", function (d) { return d.position.y * scaling + scaling/2; })
                 .attr("text", function (d) { return d.simulator; })
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "20px")
                 .attr("fill", "black");
-                */
     });
 
     svg.selectAll(".bar")

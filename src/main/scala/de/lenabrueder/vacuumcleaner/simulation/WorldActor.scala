@@ -39,7 +39,7 @@ class WorldActor extends Actor with ActorLogging {
     state = WorldState(room, for { robot <- robots } yield {
       Simulator.State(robot.path, room.randomPosition, { val v = DenseVector.rand(Room.dimension); v / norm(v) }, Simulator.maxVelocity * Math.random())
     })
-    context.system.scheduler.schedule(500.milliseconds, 50.milliseconds, self, WorldTick)
+    context.system.scheduler.schedule(500.milliseconds, 20.milliseconds, self, WorldTick)
   }
 
   def tick(): Unit = {
@@ -53,7 +53,7 @@ class WorldActor extends Actor with ActorLogging {
       Try(statePlane.update(robotState.position(0).floor.toInt, robotState.position(1).floor.toInt, robotState.simulator.name.filter(_.isDigit).toInt))
     }
     for (i <- 1 to 30) { println() }
-    println(statePlane.toString.replaceAll("0", " "))
+    println(statePlane.toString.replaceAll(" ", "").replaceAll("0", " "))
   }
 }
 

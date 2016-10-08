@@ -34,7 +34,7 @@ class RobotSimulation extends Actor {
     //bump another robot case
     val contactAfterMovement = others.filter(_.position.contact(RobotSimulation.robotSize)(myNewState.position))
     for { (contactedRobot, contactedRobotPosition) <- contactAfterMovement.map(robot => (robot.simulator, robot.position)) } {
-      context.actorSelection(contactedRobot) ! RobotBrain.BumpRobot(self.path)
+      context.actorSelection(contactedRobot) ! RobotBrain.BumpedByRobot(self.path)
       brain ! RobotBrain.BumpRobot(contactedRobot)
       myNewState = myNewState.copy(position = {
           def difference = contactedRobotPosition - myNewState.position
@@ -64,8 +64,8 @@ class RobotSimulation extends Actor {
     case Faster            => state = state.copy(velocity = (state.velocity + (RobotSimulation.maxVelocity / 10.0)) max RobotSimulation.maxVelocity)
     case Slower            => state = state.copy(velocity = (state.velocity - (RobotSimulation.maxVelocity / 10.0)) min -RobotSimulation.maxVelocity)
     case Stop              => state = state.copy(velocity = 0.0)
-    case TurnRight(amount) => state = state.copy(heading = rot(deg2rad(-amount)) * state.heading)
-    case TurnLeft(amount)  => state = state.copy(heading = rot(deg2rad(amount)) * state.heading)
+    case TurnRight(amount) => state = state.copy(heading = rot(deg2rad(amount)) * state.heading)
+    case TurnLeft(amount)  => state = state.copy(heading = rot(deg2rad(-amount)) * state.heading)
     case LogState          => println(state)
     case other             => brain ! other
   }
@@ -73,7 +73,7 @@ class RobotSimulation extends Actor {
 
 object RobotSimulation {
   val robotSize = 0.5
-  val maxVelocity = robotSize / 8
+  val maxVelocity = robotSize / 16
 
   case class State(
     simulator: ActorPath,
