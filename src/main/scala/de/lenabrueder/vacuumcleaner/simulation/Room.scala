@@ -1,4 +1,4 @@
-package de.lenabrueder.vacuumcleaner
+package de.lenabrueder.vacuumcleaner.simulation
 
 import breeze.linalg.DenseVector
 
@@ -23,7 +23,7 @@ object Room {
   val dimension = 2
 }
 
-class RectangleRoom(w: Double, h: Double) extends Room {
+case class RectangleRoom(w: Double, h: Double) extends Room {
   override val scaling: Double = Seq(w, h).max
 
   override def isInside(vec: DenseVector[Double]): Boolean = {

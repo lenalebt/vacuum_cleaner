@@ -1,7 +1,7 @@
-package de.lenabrueder.vacuumcleaner
+package de.lenabrueder.vacuumcleaner.simulation
 
 import akka.actor.{ Actor, ActorPath }
-import de.lenabrueder.vacuumcleaner.RobotBrain._
+import de.lenabrueder.vacuumcleaner.simulation.RobotBrain.{ BumpRobot, BumpWall, TurnRight }
 
 /**
   * Contains the "brain" of the robot. The brain gets messages from the simulation from time to time, such

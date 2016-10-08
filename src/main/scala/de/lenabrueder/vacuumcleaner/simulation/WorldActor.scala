@@ -1,8 +1,8 @@
-package de.lenabrueder.vacuumcleaner
+package de.lenabrueder.vacuumcleaner.simulation
 
 import akka.actor.{ Actor, ActorLogging, ActorPath, ActorRef, Props }
 import breeze.linalg.{ DenseMatrix, DenseVector, norm }
-import de.lenabrueder.vacuumcleaner.WorldActor.{ Done, Simulator, StartSimulation, Tick, TickDone, WorldState, WorldTick }
+import de.lenabrueder.vacuumcleaner.simulation.WorldActor.{ Done, GetStatus, Simulator, StartSimulation, StatusUpdate, Tick, TickDone, WorldState, WorldTick }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -28,6 +28,7 @@ class WorldActor extends Actor with ActorLogging {
     case WorldTick =>
       printState()
       tick()
+    case GetStatus => sender() ! StatusUpdate(state)
   }
 
   def startSimulation(newRoom: Room, numRobots: Int): Unit = {

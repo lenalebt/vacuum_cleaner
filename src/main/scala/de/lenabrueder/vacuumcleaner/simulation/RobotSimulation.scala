@@ -1,12 +1,12 @@
-package de.lenabrueder.vacuumcleaner
+package de.lenabrueder.vacuumcleaner.simulation
 
 import akka.actor.{ Actor, ActorPath, ActorRef, Props }
 import breeze.linalg.{ DenseMatrix, DenseVector, norm }
-import de.lenabrueder.vacuumcleaner.RobotBrain._
-import de.lenabrueder.vacuumcleaner.WorldActor.{ DenseVectorOps, SimulatorState, Tick, TickDone, WorldState }
-
-import scalaz.Scalaz._
+import de.lenabrueder.vacuumcleaner.simulation.RobotBrain._
+import de.lenabrueder.vacuumcleaner.simulation.WorldActor.{ SimulatorState, Tick, TickDone, WorldState }
 import scalaz._
+import Scalaz._
+import de.lenabrueder.vacuumcleaner.simulation.WorldActor.DenseVectorOps
 
 /**
   * A simulation of a robot. Reacts to both changes of the world, or changes triggered through its brain (if any).
@@ -39,7 +39,7 @@ class RobotSimulation extends Actor {
       myNewState = myNewState.copy(position = {
           def difference = contactedRobotPosition - myNewState.position
         //this is the position where the robots contact each other, from the new projected position, moving myself but not the other robot.
-        contactedRobotPosition + (difference / norm(difference)) * (2.0 * RobotSimulation.robotSize)
+        contactedRobotPosition - (difference / norm(difference)) * (2.0 * RobotSimulation.robotSize)
       })
     }
 
@@ -53,7 +53,7 @@ class RobotSimulation extends Actor {
 
   def recreate(state: WorldActor.SimulatorState): RobotSimulation.State = RobotSimulation.State(state.simulator, state.position, state.heading, state.velocity)
 
-  import Math.{ sin, cos }
+  import Math.{ cos, sin }
   def deg2rad(deg: Double): Double = deg * 3.14159265358979 / 180.0
   def rot(degree: Double): DenseMatrix[Double] = DenseMatrix((cos(degree), -sin(degree)), (sin(degree), cos(degree)))
 
