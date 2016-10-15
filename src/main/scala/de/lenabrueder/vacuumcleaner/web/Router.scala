@@ -1,17 +1,20 @@
 package de.lenabrueder.vacuumcleaner.web
 
+import akka.NotUsed
 import akka.actor.ActorRef
+import akka.http.scaladsl.common.{ EntityStreamingSupport, JsonEntityStreamingSupport }
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.server.Directives._
 import de.lenabrueder.vacuumcleaner.simulation.WorldActor.{ GetStatus, SimulatorState, StatusUpdate, WorldState }
 import akka.pattern.ask
+import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import de.lenabrueder.vacuumcleaner.simulation._
 import spray.json.{ DefaultJsonProtocol, JsNumber, JsObject, JsString, JsValue, RootJsonFormat }
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ Await, ExecutionContext }
 import scala.util.Success
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -41,6 +44,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     }
   }
   implicit val worldStateFormat = jsonFormat2(WorldState)
+  implicit val jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
 }
 
 /**
@@ -64,7 +68,17 @@ class Router(worldActor: ActorRef)(implicit ec: ExecutionContext) extends Direct
       }
     } ~ path("updates") {
       get {
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+        val source: Source[WorldState, NotUsed] = Source.fromIterator(() => new Iterator[WorldState] {
+          override def hasNext: Boolean = true
+          override def next(): WorldState = {
+            Thread.sleep(250)
+            implicit val timeout = Timeout(2 seconds)
+            Await.result((worldActor ? GetStatus).map {
+              case StatusUpdate(worldState) => worldState
+            }, 3 seconds)
+          }
+        })
+        complete(source)
       }
     }
 }
