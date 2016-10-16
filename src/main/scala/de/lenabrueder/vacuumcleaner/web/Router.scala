@@ -36,7 +36,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     override def write(obj: SimulatorState): JsValue = obj match {
       case RobotSimulation.State(simulator, position, heading, velocity) =>
         JsObject(
-          "simulator" -> JsString(simulator.name),
+          "simulator" -> JsString(simulator.name.filter(_.isDigit)),
           "position" -> JsObject("x" -> JsNumber(position(0)), "y" -> JsNumber(position(1))),
           "heading" -> JsObject("x" -> JsNumber(heading(0)), "y" -> JsNumber(heading(1))),
           "velocity" -> JsNumber(velocity)

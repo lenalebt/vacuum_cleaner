@@ -24,7 +24,8 @@ object Main extends App {
   val bindingFuture = Http().bindAndHandle(router.route, "localhost", 8080)
 
   println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
-  StdIn.readLine() // let it run until user presses return
+  //StdIn.readLine() // let it run until user presses return
+  Thread.sleep(30000)
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port
     .onComplete{ _ =>

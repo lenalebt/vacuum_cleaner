@@ -26,7 +26,7 @@ class WorldActor extends Actor with ActorLogging {
     case TickDone(status) =>
       state = state.copy(states = status :: state.states.filterNot(_.simulator == sender().path).toList)
     case WorldTick =>
-      printState()
+      //printState()
       tick()
     case GetStatus => sender() ! StatusUpdate(state)
   }

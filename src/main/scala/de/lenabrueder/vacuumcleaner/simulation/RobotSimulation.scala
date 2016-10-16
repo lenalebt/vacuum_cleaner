@@ -34,8 +34,8 @@ class RobotSimulation extends Actor {
     //bump another robot case
     val contactAfterMovement = others.filter(_.position.contact(RobotSimulation.robotSize)(myNewState.position))
     for { (contactedRobot, contactedRobotPosition) <- contactAfterMovement.map(robot => (robot.simulator, robot.position)) } {
-      context.actorSelection(contactedRobot) ! RobotBrain.BumpedByRobot(self.path)
-      brain ! RobotBrain.BumpRobot(contactedRobot)
+      context.actorSelection(contactedRobot) ! RobotBrain.BumpedByRobot
+      brain ! RobotBrain.BumpRobot
       myNewState = myNewState.copy(position = {
           def difference = contactedRobotPosition - myNewState.position
         //this is the position where the robots contact each other, from the new projected position, moving myself but not the other robot.
@@ -66,6 +66,7 @@ class RobotSimulation extends Actor {
     case Stop              => state = state.copy(velocity = 0.0)
     case TurnRight(amount) => state = state.copy(heading = rot(deg2rad(amount)) * state.heading)
     case TurnLeft(amount)  => state = state.copy(heading = rot(deg2rad(-amount)) * state.heading)
+    case TurnAround        => state = state.copy(heading = rot(deg2rad(180.0)) * state.heading)
     case LogState          => println(state)
     case other             => brain ! other
   }

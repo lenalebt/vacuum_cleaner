@@ -31,3 +31,6 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 tutSettings
 tutSourceDirectory := baseDirectory.value / "tut"
 tutTargetDirectory := baseDirectory.value
+
+
+fork in run := true
