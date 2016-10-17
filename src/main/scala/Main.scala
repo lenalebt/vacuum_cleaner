@@ -21,9 +21,9 @@ object Main extends App {
   world ? WorldActor.StartSimulation(new RectangleRoom(20, 20), 9)
 
   private val router = new Router(world)
-  val bindingFuture = Http().bindAndHandle(router.route, "localhost", 8080)
+  val bindingFuture = Http().bindAndHandle(router.route, "0.0.0.0", 8080)
 
-  println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+  println(s"Server online at http://0.0.0.0:8080/\nPress RETURN to stop...")
   //StdIn.readLine() // let it run until user presses return
   Thread.sleep(30000)
   bindingFuture
