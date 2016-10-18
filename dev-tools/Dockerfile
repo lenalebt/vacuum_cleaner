@@ -15,7 +15,7 @@ RUN wget https://downloads.typesafe.com/typesafe-activator/1.3.10/typesafe-activ
     chmod a+x activator-1.3.10-minimal/bin/activator
 RUN git clone https://github.com/lenalebt/vacuum_cleaner.git
 RUN cd vacuum_cleaner && ../activator-1.3.10-minimal/bin/activator compile
-RUN cd vacuum_cleaner && timeout 150s ../activator-1.3.10-minimal/bin/activator ui || echo
+RUN cd vacuum_cleaner && timeout 180s ../activator-1.3.10-minimal/bin/activator ui || echo
 RUN rm -f vacuum_cleaner/RUNNING_PID
 
 EXPOSE 8080
