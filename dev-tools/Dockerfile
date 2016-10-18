@@ -10,14 +10,14 @@ RUN useradd -ms /bin/bash user
 USER user
 WORKDIR /home/user
 RUN sbt exit
-RUN wget https://downloads.typesafe.com/typesafe-activator/1.3.10/typesafe-activator-1.3.10-minimal.zip && \
-	unzip typesafe-activator-1.3.10-minimal.zip && \
-    chmod a+x activator-1.3.10-minimal/bin/activator
+RUN wget https://downloads.typesafe.com/typesafe-activator/1.3.11/typesafe-activator-1.3.11-minimal.zip && \
+	unzip typesafe-activator-1.3.11-minimal.zip && \
+    chmod a+x activator-1.3.11-minimal/bin/activator
 RUN git clone https://github.com/lenalebt/vacuum_cleaner.git
-RUN cd vacuum_cleaner && ../activator-1.3.10-minimal/bin/activator compile
-RUN cd vacuum_cleaner && timeout 180s ../activator-1.3.10-minimal/bin/activator ui || echo
+RUN cd vacuum_cleaner && ../activator-1.3.11-minimal/bin/activator compile
+RUN cd vacuum_cleaner && timeout 180s ../activator-1.3.11-minimal/bin/activator ui || echo
 RUN rm -f vacuum_cleaner/RUNNING_PID
 
 EXPOSE 8080
 EXPOSE 8888
-ENTRYPOINT cd vacuum_cleaner && ../activator-1.3.10-minimal/bin/activator -Dhttp.address=0.0.0.0 ui
+ENTRYPOINT cd vacuum_cleaner && ../activator-1.3.11-minimal/bin/activator -Dhttp.address=0.0.0.0 ui

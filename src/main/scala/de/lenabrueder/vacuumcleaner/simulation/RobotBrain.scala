@@ -10,7 +10,7 @@ import de.lenabrueder.vacuumcleaner.simulation.RobotBrain._
 class RobotBrain extends Actor {
   override def receive: Receive = {
     case BumpWall      =>
-    //sender() ! TurnRight(10.0)
+    //sender() ! TurnRight(5.0)
     case BumpRobot     =>
     //sender() ! TurnRight(5.0)
     case BumpedByRobot => //???
